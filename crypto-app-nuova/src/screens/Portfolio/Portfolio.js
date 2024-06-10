@@ -5,6 +5,7 @@ import { Picker } from "@react-native-picker/picker";
 import { useCrypto } from "../../Context/CryptoContext";
 import { Ionicons } from "@expo/vector-icons";
 import ConfirmModal from "../../Component/ConfirmModal";
+import NetInfo from "@react-native-community/netinfo";
 
 export default function Portfolio() {
   const { cryptos,
@@ -29,6 +30,9 @@ export default function Portfolio() {
   const [modalVisible, setModalVisible] = useState(false)
 
   const [itemToDelate, setItemToDelate] = useState(null)
+
+   const [isOffline, setIsOffline] = useState(false);
+
 
   function showModal(item)
   {
@@ -130,6 +134,15 @@ export default function Portfolio() {
   // }
 
 
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsOffline(!state.isConnected);
+    });
+    return () => unsubscribe();
+
+  }, [])
+
+
     useEffect(() => {
       getCryptos;
       if (cryptos.length) {
@@ -145,91 +158,142 @@ export default function Portfolio() {
 
   return (
     <>
-      <View style={GlobalStyles.container2}>
-        <View style={styled.contenitoreTitolo}>
-          <View style={styled.allineamentoL}>
-            <Ionicons
-              name="wallet-outline"
-              style={styled.textGenerico}
-            ></Ionicons>
-          </View>
-          <View style={styled.allineamentoR}>
-            <Text style={styled.textGenerico}>Portfolio</Text>
-          </View>
-        </View>
-
-        {/* contenitore delle crypto totali possedute */}
-        <View>
-          {portfolio.map((moneta) => (
-            <View style={styled.contenitoreValute}>
-              <Text style={styled.testoValute}>
-                {moneta.quantita} {moneta.crypto}
-              </Text>
-              <TouchableOpacity style={styled.contenitoreBottoneTrash}>
+      {isOffline ? (
+        <>
+          <View style={GlobalStyles.container2}>
+            <View style={styled.contenitoreTitolo}>
+              <View style={styled.allineamentoL}>
                 <Ionicons
-                  name={"trash-outline"}
-                  size={30}
-                  color={"white"}
-                  onPress={() => showModal(moneta.crypto)}
-                />
+                  name="wallet-outline"
+                  style={styled.textGenerico}
+                ></Ionicons>
+              </View>
+              <View style={styled.allineamentoR}>
+                <Text style={styled.textGenerico}>Portfolio</Text>
+              </View>
+            </View>
+
+            {/* contenitore delle crypto totali possedute */}
+            <View>
+              {portfolio.map((moneta) => (
+                <View style={styled.contenitoreValute}>
+                  <Text style={styled.testoValute}>
+                    {moneta.quantita} {moneta.crypto}
+                  </Text>
+                </View>
+              ))}
+            </View>
+
+            <View style={styled.contenitoreOffline}>
+              <Image
+                source={require("../../img/LogoBTC.jpeg")}
+                style={styled.img}
+              />
+              <Text style={[styled.textOffline]}>
+                C'è stato un problema, verifica la tua connessione!
+              </Text>
+            </View>
+          </View>
+        </>
+      ) : (
+        <>
+          <View style={GlobalStyles.container2}>
+            <View style={styled.contenitoreTitolo}>
+              <View style={styled.allineamentoL}>
+                <Ionicons
+                  name="wallet-outline"
+                  style={styled.textGenerico}
+                ></Ionicons>
+              </View>
+              <View style={styled.allineamentoR}>
+                <Text style={styled.textGenerico}>Portfolio</Text>
+              </View>
+            </View>
+
+            {/* contenitore delle crypto totali possedute */}
+            <View>
+              {portfolio.map((moneta) => (
+                <View style={styled.contenitoreValute}>
+                  <Text style={styled.testoValute}>
+                    {moneta.quantita} {moneta.crypto}
+                  </Text>
+                  <TouchableOpacity style={styled.contenitoreBottoneTrash}>
+                    <Ionicons
+                      name={"trash-outline"}
+                      size={30}
+                      color={"white"}
+                      onPress={() => showModal(moneta.crypto)}
+                    />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+
+            <View>
+              <Text style={styled.textGenerico}>Qtà:</Text>
+              <TextInput
+                style={[styled.input]}
+                keyboardType="numeric"
+                value={quantita}
+                onChangeText={(text) => {
+                  // Consenti solo numeri (e, opzionalmente, un punto per i decimali)
+                  const filteredText = text.replace(/[^0-9.]/g, "");
+                  setQuantita(filteredText);
+                }}
+              />
+              <View style={styled.pickerCon}>
+                <Picker
+                  selectedValue={selectedCrypto}
+                  style={styled.picker}
+                  onValueChange={(itemValue, itemIndex) =>
+                    setSelectedCrypto(itemValue)
+                  }
+                >
+                  <Picker.Item
+                    label="Seleziona crypto"
+                    value=""
+                    color="white"
+                  />
+                  {valoriSelect.map((crypto) => (
+                    <Picker.Item
+                      key={crypto}
+                      label={crypto}
+                      value={crypto}
+                      color="white"
+                    />
+                  ))}
+                </Picker>
+              </View>
+              <View style={styled.contenitoreBottoneA}>
+                <TouchableOpacity
+                  onPress={aggiungiAlPortfolio}
+                  disabled={!isButtonEnabled}
+                  style={[
+                    styled.bottoni,
+                    { opacity: isButtonEnabled ? 1 : 0.3 },
+                  ]}
+                >
+                  <Text>Aggiungi Crypto</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View style={styled.contenitoreBottoneB}>
+              <TouchableOpacity
+                style={[styled.bottoni]}
+                onPress={rimuoviPortfolio}
+              >
+                <Text>Svuota Portfolio</Text>
               </TouchableOpacity>
             </View>
-          ))}
-        </View>
-
-        <View>
-          <Text style={styled.textGenerico}>Qtà:</Text>
-          <TextInput
-            style={[styled.input]}
-            keyboardType="numeric"
-            value={quantita}
-            onChangeText={(text) => {
-              // Consenti solo numeri (e, opzionalmente, un punto per i decimali)
-              const filteredText = text.replace(/[^0-9.]/g, "");
-              setQuantita(filteredText);
-            }}
+          </View>
+          <ConfirmModal
+            isVisible={modalVisible}
+            onConfirm={confirmDelete}
+            onCancel={() => setModalVisible(false)}
+            item={itemToDelate}
           />
-          <View style={styled.pickerCon}>
-            <Picker
-              selectedValue={selectedCrypto}
-              style={styled.picker}
-              onValueChange={(itemValue, itemIndex) =>
-                setSelectedCrypto(itemValue)
-              }
-            >
-              <Picker.Item label="Seleziona crypto" value="" color="white" />
-              {valoriSelect.map((crypto) => (
-                <Picker.Item
-                  key={crypto}
-                  label={crypto}
-                  value={crypto}
-                  color="white"
-                />
-              ))}
-            </Picker>
-          </View>
-          <View style={styled.contenitoreBottoneA}>
-            <TouchableOpacity
-              onPress={aggiungiAlPortfolio}
-              disabled={!isButtonEnabled}
-              style={[styled.bottoni, { opacity: isButtonEnabled ? 1 : 0.3 }]}
-            >
-              <Text>Aggiungi Crypto</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View style={styled.contenitoreBottoneB}>
-          <TouchableOpacity style={[styled.bottoni]} onPress={rimuoviPortfolio}>
-            <Text>Svuota Portfolio</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-      <ConfirmModal
-        isVisible={modalVisible}
-        onConfirm={confirmDelete}
-        onCancel={() => setModalVisible(false)}
-        item={itemToDelate}
-      />
+        </>
+      )}
     </>
   );
 }
@@ -278,6 +342,19 @@ const styled = StyleSheet.create({
     marginBottom: 20,
   },
 
+  contenitoreOffline: {
+    backgroundColor: "white",
+    justifyContent: "center",
+    width: "70%",
+    borderRadius: 10,
+    margin: "auto",
+    alignItems: "center",
+    padding: 20,
+    backgroundColor: "#0F141E",
+    borderColor: "grey",
+    borderWidth: 1,
+  },
+
   //allineamenti
 
   allineamentoL: {
@@ -305,6 +382,11 @@ const styled = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     fontSize: 30,
+  },
+  textOffline: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
   },
 
   //--------------------------------------
@@ -336,6 +418,11 @@ const styled = StyleSheet.create({
 
   //---------------------------------
 
+  img: {
+    height: "30%",
+    width: "40%",
+    marginBottom: 15,
+  },
 });
 
 

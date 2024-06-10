@@ -1,4 +1,3 @@
-
 //importa tutto = *
 import * as React from "react";
 //VIEW è IL DIV
@@ -6,37 +5,33 @@ import { View, Text, TouchableOpacity } from "react-native";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import {createStackNavigator} from "@react-navigation/stack"
+import { createStackNavigator } from "@react-navigation/stack";
 
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from "@expo/vector-icons";
 
 import Home from "../screens/Home/Home";
 import Portfolio from "../screens/Portfolio/Portfolio";
 import CustomDrawerContent from "../Component/CustomDrawerContent";
 import Dettaglio from "../screens/Dettaglio/Dettaglio";
+import Grafico from "../Component/Grafico";
 
 import { useCrypto } from "../Context/CryptoContext";
 
 //costante per la navigazione del drawer
 const Drawer = createDrawerNavigator();
-
-
+//Navigazione pagine
+const Stack = createStackNavigator();
 
 export default function AppNavigation() {
-
   const { getCryptos } = useCrypto();
   function reload() {
-    getCryptos
-    console.log('reload')
-}
+    getCryptos();
+    console.log("reload");
+  }
 
   return (
     <>
-
       <NavigationContainer>
-
-
-
         {/* Navigazione del DRAWER */}
         <Drawer.Navigator
           initialRouteName="Home"
@@ -55,7 +50,7 @@ export default function AppNavigation() {
             headerTintColor: "yellow",
             headerTitleStyle: {
               fontWeight: "bold",
-              fontSize: "20",
+              fontSize: 20,
               letterSpacing: 7,
             },
             title: "CRYPTO APP",
@@ -86,9 +81,24 @@ export default function AppNavigation() {
               ),
             }}
           />
+
+          <Drawer.Screen
+            name="Grafico"
+            component={Grafico}
+            options={{
+              //questo in realtà viene poi gestito e generato da DrawerItemList, in quando lo stiamo passando li come props
+              drawerLabel: "Grafico",
+              drawerLabelStyle: { fontSize: 16, color: "white" },
+              drawerIcon: () => (
+                <Ionicons name={"wallet-outline"} size={20} color={"white"} />
+              ),
+            }}
+          />
+
+          <Stack.Screen name="Dettaglio" component={Dettaglio} />
+          
         </Drawer.Navigator>
       </NavigationContainer>
     </>
   );
-
 }
