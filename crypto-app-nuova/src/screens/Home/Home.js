@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Text,
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Image,
-} from "react-native";
+import {Text, View,StyleSheet,TouchableOpacity, ScrollView,Image,} from "react-native";
 import { GlobalStyles } from "../../GlobalStyle";
 import { Ionicons } from "@expo/vector-icons";
 import { useCrypto } from "../../Context/CryptoContext";
@@ -20,13 +13,29 @@ export default function Home() {
   const navigation = useNavigation();
 
   //Varibili di stato
+
+  //Costante per il valore dell'euro
   const [euro, setEuro] = useState(0);
+
+  //Costante per il cambiamento valuta dollaro/euro
   const [valuta, setValuta] = useState("dollaro");
+
+  //Costante contenente le cryptovalute
   const [cryptoValute, setCryptoValute] = useState([]);
+
+  //Costante per la gestione del pulsante mostra tutto
   const [mostraTutto, setMostraTutto] = useState(false);
+
+  //dati ricevuti dal Context
   const { cryptos, getCryptos, portfolio } = useCrypto();
+
+  //Valore del portfolio
   const [valorePortfolio, setValorePortfolio] = useState(0);
+
+  //gestione dell'offline
   const [isOffline, setIsOffline] = useState(false);
+
+  //Gestione valori della select
   const [valoriSelect, setValoriSelect] = useState({});
 
   //-----------------------------------------------
@@ -55,19 +64,12 @@ dopodiché, il campo cryptoData se è popolato aggiunge alla costante totale il 
     setValorePortfolio(totale);
   }
 
-  //Funzione per l'inizializzazione separata delle varie select
-  const initializeCryptoValute = (cryptos) => {
-    return cryptos.map((crypto) => ({
-      ...crypto,
-      selectedValue: valoriSelect[crypto.symbol],
-    }));
-  };
-
   //Funzione per accorciare e allargare il numero di cryptovalute visibili
   const accorciaListaCrypto = () => {
     const lista = mostraTutto ? cryptos.slice(0, 5) : cryptos.slice(0, 100);
     setMostraTutto(!mostraTutto);
-    //Questa funzione serve a far si che quando il pulsante Mostra viene premuto i valori delle select non vengono resettati
+    
+    //Questa parte aggiunge il campo selectdValue a ogni cryptovaluta e serve a far si che quando il pulsante Mostra viene premuto i valori delle select non vengono resettati
     setCryptoValute(initializeCryptoValute(lista));
   };
 
@@ -114,14 +116,21 @@ dopodiché, il campo cryptoData se è popolato aggiunge alla costante totale il 
     return valuta === "dollaro" ? prezzo : prezzo * euro;
   };
 
+  //Funzione che permette di rendere il valore selezionato dalla select persistente anche se la lista subisce cambiamenti, come essere aggiornata ecc...
+  const initializeCryptoValute = (cryptos) => {
+    return cryptos.map((crypto) => ({
+      ...crypto,
+      selectedValue: valoriSelect[crypto.symbol],
+    }));
+  };
+
   //HandleOnChange per la gestione del cambio valore all'interno del picker
   /*
 
   Utilizzando la funzione di aggiornamento dello stato con la forma (item) => ({ ...item, [symbol]: value }), si aggiorna lo stato valoriSelect, inserendo o sovrascrivendo il valore selezionato value per la chiave symbol all'interno dell'oggetto valoriSelect.
-  
-  
-  
+
   */
+
   const handlePickerChange = (value, symbol) => {
     setValoriSelect((item) => ({ ...item, [symbol]: value }));
     setCryptoValute((item) =>
@@ -265,7 +274,7 @@ dopodiché, il campo cryptoData se è popolato aggiunge alla costante totale il 
                             )}`}
                             value={moneta.quote.USD.percent_change_1h}
                             color={
-                              moneta.quote.USD.percent_change_1h>= 0
+                              moneta.quote.USD.percent_change_1h >= 0
                                 ? "green"
                                 : "red"
                             }

@@ -13,7 +13,7 @@ import Home from "../screens/Home/Home";
 import Portfolio from "../screens/Portfolio/Portfolio";
 import CustomDrawerContent from "../Component/CustomDrawerContent";
 import Dettaglio from "../screens/Dettaglio/Dettaglio";
-import Grafico from "../Component/Grafico";
+
 
 import { useCrypto } from "../Context/CryptoContext";
 
@@ -82,21 +82,8 @@ export default function AppNavigation() {
             }}
           />
 
-          <Drawer.Screen
-            name="Grafico"
-            component={Grafico}
-            options={{
-              //questo in realtà viene poi gestito e generato da DrawerItemList, in quando lo stiamo passando li come props
-              drawerLabel: "Grafico",
-              drawerLabelStyle: { fontSize: 16, color: "white" },
-              drawerIcon: () => (
-                <Ionicons name={"wallet-outline"} size={20} color={"white"} />
-              ),
-            }}
-          />
-
           <Stack.Screen name="Dettaglio" component={Dettaglio} />
-          
+
         </Drawer.Navigator>
       </NavigationContainer>
     </>
